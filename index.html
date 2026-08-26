@@ -1,0 +1,3165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>One More Chance</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --bg:#FFF9F2;
+  --paper:#FFFFFF;
+  --bg-soft:#FCE4EC;
+  --ink:#3B2530;
+  --ink-soft:#9C7C87;
+  --accent:#F2799E;
+  --accent-deep:#DD5C87;
+  --accent-ink:#FFFFFF;
+  --leaf:#9BB98D;
+  --line:rgba(59,37,48,0.12);
+  --shadow:rgba(59,37,48,0.14);
+}
+
+
+/* =========================
+   DARK MODE
+========================= */
+
+@media (prefers-color-scheme: dark){
+
+  :root:not([data-theme="light"]){
+    --bg:#241019;
+    --paper:#321722;
+    --bg-soft:#3D1C2A;
+    --ink:#F8E9EE;
+    --ink-soft:#C79CAA;
+    --accent:#FF93B8;
+    --accent-deep:#FFB9D2;
+    --accent-ink:#2B0F18;
+    --leaf:#89B37D;
+    --line:rgba(248,233,238,0.14);
+    --shadow:rgba(0,0,0,0.45);
+  }
+
+}
+
+:root[data-theme="dark"]{
+  --bg:#241019;
+  --paper:#321722;
+  --bg-soft:#3D1C2A;
+  --ink:#F8E9EE;
+  --ink-soft:#C79CAA;
+  --accent:#FF93B8;
+  --accent-deep:#FFB9D2;
+  --accent-ink:#2B0F18;
+  --leaf:#89B37D;
+  --line:rgba(248,233,238,0.14);
+  --shadow:rgba(0,0,0,0.45);
+}
+
+
+/* =========================
+   GLOBAL
+========================= */
+
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  height:100%;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+
+  font-size:1.05rem;
+  line-height:1.75;
+
+  -webkit-font-smoothing:antialiased;
+
+  overflow:hidden;
+}
+
+h1,
+h2,
+h3{
+  font-family:
+    'Playfair Display',
+    Georgia,
+    'Times New Roman',
+    serif;
+
+  font-weight:600;
+  text-wrap:balance;
+  margin:0;
+}
+
+p{
+  margin:0;
+}
+
+button{
+  font-family:inherit;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+}
+
+
+/* =========================
+   VIEWPORT
+========================= */
+
+.viewport{
+  flex:1;
+  overflow:hidden;
+  position:relative;
+}
+
+.track{
+  display:flex;
+  height:100%;
+
+  transition:
+    transform .65s cubic-bezier(.4,0,.2,1);
+
+  will-change:transform;
+}
+
+@media(prefers-reduced-motion:reduce){
+  .track{
+    transition:none;
+  }
+}
+
+
+/* =========================
+   PAGES
+========================= */
+
+.page{
+  flex:0 0 100vw;
+  height:100%;
+
+  overflow-y:auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:56px 28px;
+
+  text-align:center;
+}
+
+.page-inner{
+  max-width:600px;
+  width:100%;
+  position:relative;
+  z-index:2;
+}
+
+
+/* =========================
+   REVEAL
+========================= */
+
+.reveal{
+  opacity:0;
+  transform:translateY(14px);
+
+  transition:
+    opacity .7s ease,
+    transform .7s ease;
+}
+
+.reveal.in{
+  opacity:1;
+  transform:translateY(0);
+}
+
+
+/* =========================
+   STICKERS
+========================= */
+
+.sticker-deco{
+  position:absolute;
+  font-size:2rem;
+
+  pointer-events:none;
+  user-select:none;
+
+  filter:
+    drop-shadow(
+      0 4px 8px var(--shadow)
+    );
+
+  z-index:2;
+}
+
+.pos-tr{
+  top:-16px;
+  right:-6px;
+  transform:rotate(12deg);
+}
+
+.pos-tl{
+  top:-12px;
+  left:-10px;
+  transform:rotate(-11deg);
+}
+
+.pos-br{
+  bottom:-6px;
+  right:-12px;
+  transform:rotate(-8deg);
+}
+
+@media(max-width:480px){
+
+  .sticker-deco{
+    font-size:1.6rem;
+  }
+
+}
+
+
+/* =========================
+   DOTS
+========================= */
+
+.dots{
+  position:fixed;
+  right:20px;
+  top:50%;
+
+  transform:translateY(-50%);
+
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+
+  z-index:40;
+}
+
+.dot{
+  width:7px;
+  height:7px;
+
+  border-radius:50%;
+
+  background:var(--line);
+
+  border:none;
+  padding:0;
+
+  cursor:pointer;
+
+  transition:
+    background .25s ease,
+    transform .25s ease;
+}
+
+.dot.active{
+  background:var(--accent);
+  transform:scale(1.35);
+}
+
+.dot[data-unlocked="false"]{
+  cursor:default;
+}
+
+@media(max-width:640px){
+
+  .dots{
+    right:12px;
+  }
+
+}
+
+
+/* =========================
+   MUSIC BUTTON
+========================= */
+
+.note-toggle{
+  position:fixed;
+
+  bottom:14px;
+  left:20px;
+
+  appearance:none;
+
+  cursor:pointer;
+
+  font-family:inherit;
+
+  font-size:.8rem;
+
+  color:var(--ink-soft);
+
+  background:var(--paper);
+
+  border:1px solid var(--line);
+
+  border-radius:999px;
+
+  padding:7px 14px;
+
+  opacity:.85;
+
+  z-index:40;
+
+  transition:
+    opacity .2s ease,
+    color .2s ease,
+    transform .2s ease;
+}
+
+.note-toggle:hover{
+  opacity:1;
+  color:var(--ink);
+  transform:translateY(-1px);
+}
+
+.note-toggle:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.nav-bar{
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  gap:22px;
+
+  padding:
+    16px
+    20px
+    calc(
+      16px +
+      env(safe-area-inset-bottom)
+    );
+
+  z-index:40;
+}
+
+.nav-bar.hidden{
+  display:none;
+}
+
+.nav-btn{
+  appearance:none;
+
+  background:none;
+  border:none;
+
+  color:var(--ink-soft);
+
+  font-size:.88rem;
+
+  letter-spacing:.02em;
+
+  cursor:pointer;
+
+  padding:8px 6px;
+
+  transition:
+    color .2s ease,
+    opacity .2s ease;
+}
+
+.nav-btn:hover:not(:disabled){
+  color:var(--ink);
+}
+
+.nav-btn:disabled{
+  opacity:.3;
+  cursor:default;
+}
+
+.nav-btn:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+
+.page-counter{
+  font-size:.78rem;
+
+  color:var(--ink-soft);
+
+  letter-spacing:.06em;
+
+  font-variant-numeric:tabular-nums;
+
+  min-width:44px;
+
+  text-align:center;
+}
+
+
+/* =========================
+   FIRST PAGE
+========================= */
+
+#page-0{
+  position:relative;
+
+  align-items:flex-start;
+
+  padding-top:64px;
+}
+
+
+/* =========================
+   FALLING PETALS
+========================= */
+
+.petals{
+  position:absolute;
+
+  inset:0;
+
+  overflow:hidden;
+
+  pointer-events:none;
+
+  z-index:1;
+}
+
+.petal{
+  position:absolute;
+
+  top:-8%;
+
+  border-radius:
+    60% 40% 55% 45% /
+    55% 45% 60% 40%;
+
+  animation-name:petalFall;
+
+  animation-timing-function:ease-in-out;
+
+  animation-iteration-count:infinite;
+
+  will-change:
+    transform,
+    opacity;
+}
+
+@keyframes petalFall{
+
+  0%{
+    transform:
+      translate(0,0)
+      rotate(0deg);
+
+    opacity:0;
+  }
+
+  8%{
+    opacity:.8;
+  }
+
+  50%{
+    transform:
+      translate(
+        var(--sway,24px),
+        58vh
+      )
+      rotate(170deg);
+  }
+
+  92%{
+    opacity:.75;
+  }
+
+  100%{
+    transform:
+      translate(
+        calc(
+          var(--sway,24px) * -1
+        ),
+        122vh
+      )
+      rotate(340deg);
+
+    opacity:0;
+  }
+}
+
+
+/* =========================
+   ENVELOPE
+========================= */
+
+.envelope-wrap{
+  width:min(260px,64vw);
+
+  aspect-ratio:3/2;
+
+  position:relative;
+
+  perspective:1200px;
+
+  margin:0 auto 32px;
+}
+
+.envelope-body{
+  position:absolute;
+  inset:0;
+
+  background:var(--paper);
+
+  border:1px solid var(--line);
+
+  border-radius:6px;
+
+  box-shadow:
+    0 18px 40px -18px
+    var(--shadow);
+
+  overflow:hidden;
+}
+
+.envelope-body::before{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  background:
+
+    linear-gradient(
+      to bottom right,
+      transparent 49.6%,
+      var(--line) 49.6%,
+      var(--line) 50.4%,
+      transparent 50.4%
+    ),
+
+    linear-gradient(
+      to bottom left,
+      transparent 49.6%,
+      var(--line) 49.6%,
+      var(--line) 50.4%,
+      transparent 50.4%
+    );
+}
+
+.envelope-flap{
+  position:absolute;
+
+  top:0;
+  left:0;
+  right:0;
+
+  height:62%;
+
+  background:var(--bg-soft);
+
+  clip-path:
+    polygon(
+      0 0,
+      100% 0,
+      50% 90%
+    );
+
+  transform-origin:top center;
+
+  transition:
+    transform .9s cubic-bezier(.2,.8,.2,1);
+
+  border-bottom:1px solid var(--line);
+
+  z-index:3;
+}
+
+.envelope-wrap.open
+.envelope-flap{
+  transform:rotateX(180deg);
+}
+
+.envelope-seal{
+  position:absolute;
+
+  left:50%;
+  top:44%;
+
+  transform:
+    translate(-50%,-50%);
+
+  width:30px;
+  height:30px;
+
+  border-radius:50%;
+
+  background:var(--accent);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  z-index:4;
+
+  box-shadow:
+    0 6px 14px -4px
+    var(--shadow);
+
+  transition:
+    opacity .4s ease .1s,
+    transform .4s ease .1s;
+}
+
+.envelope-seal svg{
+  width:18px;
+  height:18px;
+}
+
+.envelope-wrap.open
+.envelope-seal{
+  opacity:0;
+
+  transform:
+    translate(-50%,-50%)
+    scale(.6);
+}
+
+.envelope-letter{
+  position:absolute;
+
+  left:6%;
+  right:6%;
+
+  bottom:6%;
+  top:14%;
+
+  background:var(--paper);
+
+  border:1px solid var(--line);
+
+  border-radius:4px;
+
+  transform:translateY(6%);
+
+  opacity:0;
+
+  transition:
+    transform .7s cubic-bezier(.2,.8,.2,1) .25s,
+    opacity .5s ease .25s;
+
+  z-index:2;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  font-family:
+    'Playfair Display',
+    serif;
+
+  font-style:italic;
+
+  color:var(--ink-soft);
+
+  font-size:.8rem;
+}
+
+.envelope-wrap.open
+.envelope-letter{
+  transform:translateY(-14%);
+  opacity:1;
+}
+
+
+/* =========================
+   PAGE STACK
+========================= */
+
+.page0-stack{
+  display:grid;
+  justify-items:center;
+}
+
+.envelope-stage,
+.letter-paper{
+  grid-area:1/1;
+}
+
+.envelope-stage{
+  transition:
+    opacity .5s ease,
+    transform .5s ease;
+}
+
+.envelope-stage.fade{
+  opacity:0;
+  transform:scale(.85);
+}
+
+
+/* =========================
+   LETTER PAPER
+========================= */
+
+.letter-paper{
+  width:min(94vw,500px);
+
+  max-height:
+    calc(100vh - 100px);
+
+  background:var(--paper);
+
+  border:1px solid var(--line);
+
+  border-radius:16px;
+
+  box-shadow:
+    0 24px 54px -22px
+    var(--shadow);
+
+  padding:
+    38px 30px 34px;
+
+  opacity:0;
+
+  transform:scale(.28);
+
+  transform-origin:50% 6%;
+
+  transition:
+    opacity .8s ease,
+    transform .8s cubic-bezier(.2,.8,.2,1);
+
+  pointer-events:none;
+
+  z-index:5;
+
+  overflow-y:auto;
+
+  scrollbar-width:thin;
+}
+
+.letter-paper.show{
+  opacity:1;
+  transform:scale(1);
+  pointer-events:auto;
+}
+
+
+/* =========================
+   FLOWERS
+========================= */
+
+.bouquet-header{
+  width:min(64vw,168px);
+
+  margin:0 auto 6px;
+}
+
+.bouquet-header svg{
+  width:100%;
+  height:auto;
+  display:block;
+  opacity:0;
+}
+
+.letter-paper.show
+.bouquet-header svg{
+  animation:
+    bouquetGrow
+    .9s
+    cubic-bezier(.2,.8,.2,1)
+    .15s
+    forwards;
+}
+
+@keyframes bouquetGrow{
+
+  0%{
+    opacity:0;
+
+    transform:
+      scale(.7)
+      translateY(8px);
+  }
+
+  100%{
+    opacity:1;
+
+    transform:
+      scale(1)
+      translateY(0);
+  }
+}
+
+
+/* =========================
+   LETTER HEADER
+========================= */
+
+.hero-kicker{
+  font-family:
+    'Playfair Display',
+    serif;
+
+  font-style:italic;
+
+  font-size:1.35rem;
+
+  color:var(--ink-soft);
+
+  margin-bottom:8px;
+
+  opacity:0;
+
+  transition:
+    opacity .8s ease .3s;
+}
+
+.hero-kicker.show{
+  opacity:1;
+}
+
+.hero-title{
+  font-size:
+    clamp(
+      1.6rem,
+      5.5vw,
+      2.1rem
+    );
+
+  opacity:0;
+
+  transform:translateY(10px);
+
+  transition:
+    opacity .8s ease .5s,
+    transform .8s ease .5s;
+}
+
+.hero-title.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+.msg-block{
+  margin-top:28px;
+
+  padding-top:24px;
+
+  border-top:1px solid var(--line);
+
+  opacity:0;
+
+  transform:translateY(14px);
+
+  transition:
+    opacity .8s ease,
+    transform .8s ease;
+
+  text-align:left;
+}
+
+.msg-block.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.letter-paragraph{
+  margin-bottom:20px;
+}
+
+.letter-emphasis{
+  font-family:
+    'Playfair Display',
+    serif;
+
+  font-style:italic;
+
+  font-size:1.2rem;
+
+  color:var(--ink);
+
+  margin-bottom:22px;
+}
+
+.letter-final{
+  margin-top:28px;
+
+  padding-top:24px;
+
+  border-top:1px solid var(--line);
+
+  text-align:center;
+}
+
+.letter-final-question{
+  font-family:
+    'Playfair Display',
+    serif;
+
+  font-style:italic;
+
+  font-size:1.35rem;
+
+  margin-top:18px;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+  appearance:none;
+
+  border:none;
+
+  cursor:pointer;
+
+  border-radius:999px;
+
+  padding:15px 34px;
+
+  font-size:.98rem;
+
+  font-weight:500;
+
+  letter-spacing:.01em;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    opacity .2s ease,
+    background .2s ease;
+}
+
+.btn:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+}
+
+.btn-primary{
+  background:var(--ink);
+
+  color:var(--paper);
+
+  box-shadow:
+    0 10px 24px -10px
+    var(--shadow);
+}
+
+.btn-primary:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 14px 28px -10px
+    var(--shadow);
+}
+
+.continue-wrap{
+  margin-top:30px;
+
+  min-height:52px;
+
+  opacity:0;
+
+  transform:translateY(8px);
+
+  transition:
+    opacity .5s ease,
+    transform .5s ease;
+
+  pointer-events:none;
+
+  text-align:center;
+}
+
+.continue-wrap.show{
+  opacity:1;
+
+  transform:translateY(0);
+
+  pointer-events:auto;
+}
+
+
+/* =========================
+   QUESTION PAGE
+========================= */
+
+.question-title{
+  font-size:
+    clamp(
+      2.1rem,
+      6.5vw,
+      2.9rem
+    );
+
+  margin-bottom:18px;
+}
+
+.question-sub{
+  color:var(--ink-soft);
+
+  max-width:400px;
+
+  margin:
+    0 auto 34px;
+
+  min-height:3.5em;
+
+  transition:
+    opacity .3s ease;
+}
+
+.sticker{
+  font-size:4rem;
+
+  margin-bottom:12px;
+
+  display:block;
+
+  animation:
+    stickerBounce
+    1.6s
+    ease-in-out
+    infinite;
+}
+
+@keyframes stickerBounce{
+
+  0%,100%{
+    transform:
+      translateY(0)
+      rotate(-3deg);
+  }
+
+  50%{
+    transform:
+      translateY(-8px)
+      rotate(3deg);
+  }
+}
+
+.btn-row{
+  display:flex;
+
+  gap:14px;
+
+  align-items:center;
+
+  justify-content:center;
+
+  flex-wrap:wrap;
+}
+
+.btn-yes{
+  background:var(--accent);
+
+  color:var(--accent-ink);
+
+  box-shadow:
+    0 12px 26px -12px
+    var(--shadow);
+}
+
+.btn-yes:hover{
+  transform:translateY(-2px);
+
+  background:var(--accent-deep);
+}
+
+.btn-no{
+  background:transparent;
+
+  color:var(--ink-soft);
+
+  border:1px solid var(--line);
+}
+
+.btn-no:hover{
+  color:var(--ink);
+
+  border-color:var(--ink-soft);
+}
+
+
+/* =========================
+   OUTCOME
+========================= */
+
+.outcome-title{
+  font-family:
+    'Playfair Display',
+    serif;
+
+  font-style:italic;
+
+  font-size:2rem;
+
+  margin-bottom:22px;
+}
+
+.outcome p{
+  opacity:0;
+
+  transform:translateY(8px);
+
+  transition:
+    opacity .6s ease,
+    transform .6s ease;
+
+  margin-top:20px;
+}
+
+.outcome.in p{
+  opacity:1;
+
+  transform:translateY(0);
+}
+
+.outcome.in p:nth-of-type(1){
+  transition-delay:.15s;
+}
+
+.outcome.in p:nth-of-type(2){
+  transition-delay:.5s;
+}
+
+.outcome.in p:nth-of-type(3){
+  transition-delay:.85s;
+}
+
+.outcome-heart{
+  font-size:1.4rem;
+
+  color:var(--accent);
+
+  display:inline-block;
+
+  animation:
+    pulse
+    2.4s
+    ease-in-out
+    infinite;
+}
+
+@keyframes pulse{
+
+  0%,100%{
+    transform:scale(1);
+    opacity:.85;
+  }
+
+  50%{
+    transform:scale(1.15);
+    opacity:1;
+  }
+}
+
+.restart-btn{
+  margin-top:36px;
+
+  font-size:.85rem;
+
+  color:var(--ink-soft);
+
+  background:none;
+
+  border:none;
+
+  text-decoration:underline;
+
+  text-underline-offset:3px;
+
+  cursor:pointer;
+}
+
+.restart-btn:hover{
+  color:var(--ink);
+}
+
+[hidden]{
+  display:none !important;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:600px){
+
+  body{
+    font-size:1rem;
+  }
+
+  .page{
+    padding:40px 22px;
+  }
+
+  .letter-paper{
+    width:
+      calc(100vw - 34px);
+
+    max-height:
+      calc(100vh - 90px);
+
+    padding:
+      28px 20px 26px;
+  }
+
+  .msg-block{
+    font-size:.96rem;
+    line-height:1.7;
+  }
+
+  .letter-emphasis{
+    font-size:1.12rem;
+  }
+
+  .note-toggle{
+    bottom:10px;
+    left:12px;
+  }
+
+  .nav-bar{
+    padding-top:10px;
+  }
+
+}
+
+@media(prefers-reduced-motion:reduce){
+
+  .petal{
+    animation:none;
+    display:none;
+  }
+
+  .sticker{
+    animation:none;
+  }
+
+  .outcome-heart{
+    animation:none;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+  <!-- =========================
+       PAGE DOTS
+  ========================= -->
+
+  <div
+    class="dots"
+    id="dots"
+  ></div>
+
+
+  <!-- =========================
+       MUSIC BUTTON
+  ========================= -->
+
+  <button
+    class="note-toggle"
+    id="noteToggle"
+    type="button"
+    aria-pressed="false"
+  >
+    ♪ play music
+  </button>
+
+
+  <!-- =========================
+       AUDIO
+
+       Keep Song.mp3 in the
+       same folder as index.html
+  ========================= -->
+
+  <audio
+    id="bgMusic"
+    loop
+    preload="auto"
+  >
+    <source
+      src="Song.mp3"
+      type="audio/mpeg"
+    >
+  </audio>
+
+
+  <!-- =========================
+       VIEWPORT
+  ========================= -->
+
+  <div class="viewport">
+
+    <div
+      class="track"
+      id="track"
+    >
+
+
+      <!-- =================================================
+           PAGE 0 — LETTER
+      ================================================== -->
+
+      <section
+        class="page"
+        id="page-0"
+      >
+
+        <div
+          class="petals"
+          id="petals"
+          aria-hidden="true"
+        ></div>
+
+
+        <div class="page-inner">
+
+          <div class="page0-stack">
+
+
+            <!-- =========================
+                 ENVELOPE
+            ========================= -->
+
+            <div
+              class="envelope-stage"
+              id="envelopeStage"
+            >
+
+              <span
+                class="sticker-deco pos-tr"
+              >
+                🌸
+              </span>
+
+
+              <div
+                class="envelope-wrap"
+                id="envelope"
+              >
+
+                <div class="envelope-body">
+
+                  <div class="envelope-letter">
+                    for you
+                  </div>
+
+                </div>
+
+
+                <div class="envelope-flap"></div>
+
+
+                <div class="envelope-seal">
+
+                  <svg
+                    viewBox="0 0 100 100"
+                    aria-hidden="true"
+                  >
+
+                    <g
+                      fill="var(--accent-ink)"
+                    >
+
+                      <circle
+                        cx="36"
+                        cy="56"
+                        r="15"
+                      />
+
+                      <circle
+                        cx="64"
+                        cy="56"
+                        r="15"
+                      />
+
+                      <circle
+                        cx="50"
+                        cy="36"
+                        r="17"
+                      />
+
+                      <rect
+                        x="41"
+                        y="70"
+                        width="18"
+                        height="11"
+                        rx="2"
+                        opacity=".75"
+                      />
+
+                    </g>
+
+                  </svg>
+
+                </div>
+
+              </div>
+
+
+              <button
+                class="btn btn-primary"
+                id="openBtn"
+                style="margin-top:36px;"
+              >
+                Open it ♡
+              </button>
+
+            </div>
+
+
+            <!-- =========================
+                 LETTER
+            ========================= -->
+
+            <div
+              class="letter-paper"
+              id="letterPaper"
+            >
+
+
+              <!-- FLOWER BOUQUET -->
+
+              <div class="bouquet-header">
+
+                <svg
+                  viewBox="0 0 200 130"
+                  aria-hidden="true"
+                >
+
+                  <defs>
+
+                    <g id="peonyBloom">
+
+                      <g fill="var(--bg-soft)">
+
+                        <ellipse
+                          cx="0"
+                          cy="-15"
+                          rx="12"
+                          ry="17"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-15"
+                          rx="12"
+                          ry="17"
+                          transform="rotate(45)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-15"
+                          rx="12"
+                          ry="17"
+                          transform="rotate(90)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-15"
+                          rx="12"
+                          ry="17"
+                          transform="rotate(135)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-15"
+                          rx="12"
+                          ry="17"
+                          transform="rotate(180)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-15"
+                          rx="12"
+                          ry="17"
+                          transform="rotate(225)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-15"
+                          rx="12"
+                          ry="17"
+                          transform="rotate(270)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-15"
+                          rx="12"
+                          ry="17"
+                          transform="rotate(315)"
+                        />
+
+                      </g>
+
+
+                      <g fill="var(--accent)">
+
+                        <ellipse
+                          cx="0"
+                          cy="-11"
+                          rx="9"
+                          ry="13"
+                          transform="rotate(22.5)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-11"
+                          rx="9"
+                          ry="13"
+                          transform="rotate(67.5)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-11"
+                          rx="9"
+                          ry="13"
+                          transform="rotate(112.5)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-11"
+                          rx="9"
+                          ry="13"
+                          transform="rotate(157.5)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-11"
+                          rx="9"
+                          ry="13"
+                          transform="rotate(202.5)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-11"
+                          rx="9"
+                          ry="13"
+                          transform="rotate(247.5)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-11"
+                          rx="9"
+                          ry="13"
+                          transform="rotate(292.5)"
+                        />
+
+                        <ellipse
+                          cx="0"
+                          cy="-11"
+                          rx="9"
+                          ry="13"
+                          transform="rotate(337.5)"
+                        />
+
+                      </g>
+
+
+                      <circle
+                        r="5"
+                        fill="var(--accent-deep)"
+                      />
+
+                    </g>
+
+                  </defs>
+
+
+                  <path
+                    d="M100 120 C95 92,82 74,71 57"
+                    stroke="var(--leaf)"
+                    stroke-width="3"
+                    fill="none"
+                    stroke-linecap="round"
+                  />
+
+
+                  <path
+                    d="M100 120 C100 92,100 72,100 50"
+                    stroke="var(--leaf)"
+                    stroke-width="3"
+                    fill="none"
+                    stroke-linecap="round"
+                  />
+
+
+                  <path
+                    d="M100 120 C105 92,118 74,129 57"
+                    stroke="var(--leaf)"
+                    stroke-width="3"
+                    fill="none"
+                    stroke-linecap="round"
+                  />
+
+
+                  <ellipse
+                    cx="83"
+                    cy="88"
+                    rx="10"
+                    ry="5"
+                    fill="var(--leaf)"
+                    transform="rotate(-30 83 88)"
+                  />
+
+
+                  <ellipse
+                    cx="117"
+                    cy="88"
+                    rx="10"
+                    ry="5"
+                    fill="var(--leaf)"
+                    transform="rotate(30 117 88)"
+                  />
+
+
+                  <use
+                    href="#peonyBloom"
+                    transform="
+                      translate(71,57)
+                      scale(0.82)
+                      rotate(-8)
+                    "
+                  />
+
+
+                  <use
+                    href="#peonyBloom"
+                    transform="
+                      translate(100,47)
+                      scale(1.05)
+                    "
+                  />
+
+
+                  <use
+                    href="#peonyBloom"
+                    transform="
+                      translate(129,57)
+                      scale(0.78)
+                      rotate(10)
+                    "
+                  />
+
+
+                  <rect
+                    x="90"
+                    y="113"
+                    width="20"
+                    height="10"
+                    rx="3"
+                    fill="var(--accent-deep)"
+                    transform="rotate(-4 100 118)"
+                  />
+
+                </svg>
+
+              </div>
+
+
+              <!-- =========================
+                   INTRO
+              ========================= -->
+
+              <p
+                class="hero-kicker"
+                id="heroKicker"
+              >
+                
+              </p>
+
+
+              <h1
+                class="hero-title"
+                id="heroTitle"
+              >
+                Just a little something from my heart.
+              </h1>
+
+
+              <!-- =========================
+                   YOUR LETTER
+              ========================= -->
+
+              <div
+                class="msg-block"
+                id="msgBlock"
+              >
+
+
+                <p class="letter-emphasis">
+                  First, I’m sorry.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I know you’re mad at me, and honestly, I understand why.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  There were certain words I said and things I did that I already knew you didn’t like, and I still did them. I realize that I hurt you and crossed a line that I shouldn’t have.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I’m not going to make excuses for it. I should have been more careful with my words, more thoughtful about my actions, and more respectful of how you feel.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I’m truly sorry.😔
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I never wanted to hurt you.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I understand that you’re having a hard time right now. I hope everything gets better for you soon. And no matter what, I always want to see you smile.
+                </p>
+
+
+                <p class="letter-emphasis">
+                  I don’t always know how to show it in the right way, but I really do love you💕.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  You became someone incredibly important to me, and having you in my life means more to me than I sometimes know how to explain.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I love talking to you. I love the little moments we have together, the random conversations, the times we laugh about stupid things, and all the moments that probably don’t seem special to anyone else but mean so much to me.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I still remember that night when we stayed up talking together, just enjoying the moment until the sun came up at NewLand Park.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I really miss the time when we went to the Burmese monastery together and splashed water on each other during Thingyan. That day was honestly one of the happiest days I’ve ever had😌💖.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  When I’m with you, I always wish time could move as slowly as possible😭.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  Because somehow, even when we’re doing nothing special, simply being with you makes every moment feel special to me.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  Those little moments with you are some of the memories I treasure the most.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  And I don’t want to lose them.
+                </p>
+
+
+                <p class="letter-emphasis">
+                  I know saying “I’m sorry” is easy.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  So I don’t want to give you an empty promise.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I promise I’ll be more careful with my words.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I promise I’ll respect the things you’ve told me you don’t like.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I promise I’ll think about how my words and actions might make you feel before I do them.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  And if I make a mistake, I’ll listen and take responsibility instead of making excuses.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I can promise that I’ll learn from this one and do better.
+                </p>
+
+
+                <p class="letter-paragraph">
+                  I know I can’t prove any of this just by writing it here.
+                </p>
+
+
+                <p class="letter-emphasis">
+                  I have to prove it through my actions.
+                </p>
+
+
+                <p class="letter-emphasis">
+                  I love you with my entire heart.
+                </p>
+
+
+                <!-- =========================
+                     FINAL PART
+                ========================= -->
+
+                <div class="letter-final">
+
+
+                  <p class="letter-paragraph">
+                    I’m not asking you to stop being upset immediately.
+                  </p>
+
+
+                  <p class="letter-paragraph">
+                    I just want you to know how sorry I am, how much you mean to me, and how much I want to make things right.
+                  </p>
+
+
+                  <div
+                    class="continue-wrap"
+                    id="continueWrap"
+                  >
+
+                    <button
+                      class="btn btn-primary"
+                      id="continueBtn"
+                    >
+                      Continue ♡
+                    </button>
+
+                  </div>
+
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           PAGE 1 — ONE MORE CHANCE
+      ================================================== -->
+
+      <section
+        class="page"
+        id="page-1"
+      >
+
+        <div
+          class="page-inner reveal"
+        >
+
+
+          <span
+            class="sticker-deco pos-tl"
+          >
+            🩷
+          </span>
+
+
+          <span
+            class="sticker"
+            id="sticker"
+            hidden
+          >
+            🧸
+          </span>
+
+
+          <h2
+            class="question-title"
+            id="questionTitle"
+          >
+            Can I have one more chance?
+          </h2>
+
+
+          <p
+            class="question-sub"
+            id="questionSub"
+          >
+            I don't expect you to forget everything.
+            I just hope you'll let me prove that
+            I can do better.
+          </p>
+
+
+          <div class="btn-row">
+
+
+            <button
+              class="btn btn-yes"
+              id="yesBtn"
+            >
+              YES ❤️
+            </button>
+
+
+            <button
+              class="btn btn-no"
+              id="noBtn"
+            >
+              NO
+            </button>
+
+
+          </div>
+
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           PAGE 2 — OUTCOME
+      ================================================== -->
+
+      <section
+        class="page"
+        id="page-2"
+      >
+
+        <div
+          class="page-inner outcome"
+          id="outcome"
+        >
+
+
+          <!-- =========================
+               YES OUTCOME
+          ========================= -->
+
+          <div
+            id="outcomeYes"
+            hidden
+          >
+
+
+            <span
+              class="sticker-deco pos-br"
+              style="
+                position:absolute;
+                bottom:-30px;
+                right:-4px;
+              "
+            >
+              🌸
+            </span>
+
+
+            <p class="outcome-title">
+              Thank you. 🥹
+            </p>
+
+
+            <p>
+              I won’t take this chance for granted.
+            </p>
+
+
+            <p>
+              I know a promise is just words
+              until I prove it.
+              I’ll prove it. ♡
+            </p>
+
+
+            <p>
+              <span class="outcome-heart">
+                ♡
+              </span>
+
+              <br>
+
+              I love you.
+            </p>
+
+
+          </div>
+
+
+          <!-- =========================
+               NO OUTCOME
+          ========================= -->
+
+          <div
+            id="outcomeNo"
+            hidden
+          >
+
+
+            <p class="outcome-title">
+              It’s okay. 🥺
+            </p>
+
+
+            <p>
+              You don’t have to forgive me
+              just because I asked.
+              I understand that you’re hurt.
+            </p>
+
+
+            <p>
+              I’ll respect your feelings.
+            </p>
+
+
+            <p>
+              I’m still sorry. ♡
+            </p>
+
+
+          </div>
+
+
+          <button
+            class="restart-btn"
+            id="restartBtn"
+          >
+            Read it again ♡
+          </button>
+
+
+        </div>
+
+      </section>
+
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       BOTTOM NAV
+  ========================= -->
+
+  <div
+    class="nav-bar"
+    id="navBar"
+  >
+
+    <button
+      class="nav-btn"
+      id="prevBtn"
+    >
+      ‹ Back
+    </button>
+
+
+    <span
+      class="page-counter"
+      id="pageCounter"
+    >
+      1 / 2
+    </span>
+
+
+    <button
+      class="nav-btn"
+      id="nextBtn"
+    >
+      Next ›
+    </button>
+
+  </div>
+
+
+</div>
+
+
+<script>
+
+(function(){
+
+
+  /* =====================================================
+     ANALYTICS (button click logging)
+
+     Setup:
+     1. Create a Google Form with 3 short-answer
+        questions (any titles).
+     2. Use "Get pre-filled link" on the form to find
+        each question's entry.XXXXXXX id.
+     3. Paste the form id + 3 entry ids below.
+     4. Open the linked Google Sheet (Responses tab)
+        to see clicks as they happen.
+
+     This does nothing until configured — and only
+     works once this page is hosted somewhere that
+     allows outbound requests (e.g. GitHub Pages),
+     not inside the Claude Artifact preview.
+  ===================================================== */
+
+  var ANALYTICS_FORM_ID =
+    '1FAIpQLSdQg0wB_jxoF4LV_n-L4GMrG1OFmhwQFvChPXiX0iEuc5r1zw';
+
+  var ANALYTICS_ENTRY_EVENT =
+    'entry.667521190';
+
+  var ANALYTICS_ENTRY_DETAIL =
+    'entry.1983465213';
+
+  var ANALYTICS_ENTRY_SESSION =
+    'entry.260444639';
+
+  var sessionId =
+    Date.now().toString(36) +
+    Math.random().toString(36).slice(2, 8);
+
+  function logEvent(name, detail){
+
+    if(
+      ANALYTICS_FORM_ID.indexOf('PASTE_YOUR') === 0
+    ){
+      return;
+    }
+
+    try{
+
+      var url =
+        'https://docs.google.com/forms/d/e/' +
+        ANALYTICS_FORM_ID +
+        '/formResponse';
+
+      var body = new URLSearchParams();
+
+      body.append(ANALYTICS_ENTRY_EVENT, name);
+      body.append(ANALYTICS_ENTRY_DETAIL, detail || '');
+      body.append(ANALYTICS_ENTRY_SESSION, sessionId);
+
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: body
+      });
+
+    } catch(e){}
+
+  }
+
+
+  /* =====================================================
+     PAGE SYSTEM
+
+     0 = Letter
+     1 = Question
+     2 = Outcome
+  ===================================================== */
+
+  var TOTAL = 2;
+
+  var track =
+    document.getElementById('track');
+
+  var pages =
+    Array.prototype.slice.call(
+      document.querySelectorAll('.page')
+    );
+
+  var dotsWrap =
+    document.getElementById('dots');
+
+  var navBar =
+    document.getElementById('navBar');
+
+  var prevBtn =
+    document.getElementById('prevBtn');
+
+  var nextBtn =
+    document.getElementById('nextBtn');
+
+  var pageCounter =
+    document.getElementById('pageCounter');
+
+  var current = 0;
+
+
+  /*
+    Letter unlocked initially.
+    Question unlocks after Continue.
+    Outcome unlocks after YES/NO.
+  */
+
+  var unlocked = [
+    true,
+    false,
+    false
+  ];
+
+
+  /* =====================================================
+     DOTS
+  ===================================================== */
+
+  var dots = [];
+
+
+  for(
+    var i = 0;
+    i < TOTAL;
+    i++
+  ){
+
+    var d =
+      document.createElement('button');
+
+    d.className = 'dot';
+
+    d.setAttribute(
+      'data-unlocked',
+      'false'
+    );
+
+    d.setAttribute(
+      'aria-label',
+      'Page ' + (i + 1)
+    );
+
+
+    (function(idx){
+
+      d.addEventListener(
+        'click',
+        function(){
+
+          if(unlocked[idx]){
+            goTo(idx);
+          }
+
+        }
+      );
+
+    })(i);
+
+
+    dotsWrap.appendChild(d);
+
+    dots.push(d);
+
+  }
+
+
+  dots[0].setAttribute(
+    'data-unlocked',
+    'true'
+  );
+
+
+  /* =====================================================
+     REFRESH UI
+  ===================================================== */
+
+  function refreshChrome(){
+
+    dots.forEach(
+      function(d,idx){
+
+        d.classList.toggle(
+          'active',
+          idx === current
+        );
+
+        d.setAttribute(
+          'data-unlocked',
+          unlocked[idx]
+            ? 'true'
+            : 'false'
+        );
+
+      }
+    );
+
+
+    navBar.classList.toggle(
+      'hidden',
+      current === 2
+    );
+
+
+    dotsWrap.style.display =
+      current === 2
+        ? 'none'
+        : 'flex';
+
+
+    prevBtn.disabled =
+      current === 0;
+
+
+    nextBtn.disabled =
+      !unlocked[current + 1] ||
+      current + 1 > 1;
+
+
+    pageCounter.textContent =
+      (Math.min(current,1) + 1)
+      + ' / '
+      + TOTAL;
+
+  }
+
+
+  /* =====================================================
+     REVEAL
+  ===================================================== */
+
+  function playReveal(idx){
+
+    var el =
+      pages[idx].querySelector(
+        '.reveal, .outcome'
+      );
+
+    if(!el){
+      return;
+    }
+
+    el.classList.remove('in');
+
+    void el.offsetWidth;
+
+    requestAnimationFrame(
+      function(){
+        el.classList.add('in');
+      }
+    );
+
+  }
+
+
+  /* =====================================================
+     GO TO PAGE
+  ===================================================== */
+
+  function goTo(idx){
+
+    idx =
+      Math.max(
+        0,
+        Math.min(
+          pages.length - 1,
+          idx
+        )
+      );
+
+
+    if(
+      idx > 0 &&
+      !unlocked[idx]
+    ){
+      return;
+    }
+
+
+    current = idx;
+
+
+    track.style.transform =
+      'translateX(-'
+      + (idx * 100)
+      + 'vw)';
+
+
+    refreshChrome();
+
+    playReveal(idx);
+
+  }
+
+
+  /* =====================================================
+     NAVIGATION
+  ===================================================== */
+
+  prevBtn.addEventListener(
+    'click',
+    function(){
+      logEvent('nav_back_click');
+      goTo(current - 1);
+    }
+  );
+
+
+  nextBtn.addEventListener(
+    'click',
+    function(){
+      logEvent('nav_next_click');
+      goTo(current + 1);
+    }
+  );
+
+
+  /* =====================================================
+     KEYBOARD
+  ===================================================== */
+
+  document.addEventListener(
+    'keydown',
+    function(e){
+
+      if(e.key === 'ArrowRight'){
+        goTo(current + 1);
+      }
+
+      if(e.key === 'ArrowLeft'){
+        goTo(current - 1);
+      }
+
+    }
+  );
+
+
+  /* =====================================================
+     TOUCH SWIPE
+  ===================================================== */
+
+  var touchStartX = null;
+
+
+  track.addEventListener(
+    'touchstart',
+    function(e){
+
+      touchStartX =
+        e.touches[0].clientX;
+
+    },
+    {
+      passive:true
+    }
+  );
+
+
+  track.addEventListener(
+    'touchend',
+    function(e){
+
+      if(touchStartX === null){
+        return;
+      }
+
+
+      var dx =
+        e.changedTouches[0].clientX
+        - touchStartX;
+
+
+      if(Math.abs(dx) > 50){
+
+        if(dx < 0){
+          goTo(current + 1);
+        }
+        else{
+          goTo(current - 1);
+        }
+
+      }
+
+
+      touchStartX = null;
+
+    },
+    {
+      passive:true
+    }
+  );
+
+
+  /* =====================================================
+     MUSIC
+  ===================================================== */
+
+  var noteToggle =
+    document.getElementById(
+      'noteToggle'
+    );
+
+  var bgMusic =
+    document.getElementById(
+      'bgMusic'
+    );
+
+  var isPlaying = false;
+
+
+  /*
+    Music volume.
+    0.30 = 30%
+  */
+
+  bgMusic.volume = 0.30;
+
+
+  function setPlaying(playing){
+
+    if(playing){
+
+      bgMusic.play()
+        .then(
+          function(){
+
+            isPlaying = true;
+
+            noteToggle.textContent =
+              '♪ pause music';
+
+            noteToggle.setAttribute(
+              'aria-pressed',
+              'true'
+            );
+
+          }
+        )
+        .catch(
+          function(error){
+
+            console.log(
+              'Music could not start:',
+              error
+            );
+
+            noteToggle.textContent =
+              '♪ play music';
+
+          }
+        );
+
+    }
+    else{
+
+      bgMusic.pause();
+
+      isPlaying = false;
+
+      noteToggle.textContent =
+        '♪ play music';
+
+      noteToggle.setAttribute(
+        'aria-pressed',
+        'false'
+      );
+
+    }
+
+  }
+
+
+  noteToggle.addEventListener(
+    'click',
+    function(){
+
+      logEvent('music_toggle_click', String(!isPlaying));
+
+      setPlaying(!isPlaying);
+
+    }
+  );
+
+
+  /* =====================================================
+     FALLING PETALS
+  ===================================================== */
+
+  (function initPetals(){
+
+    if(
+      window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches
+    ){
+      return;
+    }
+
+
+    var wrap =
+      document.getElementById(
+        'petals'
+      );
+
+
+    var colors = [
+
+      'var(--accent)',
+
+      'var(--accent-deep)',
+
+      'var(--bg-soft)'
+
+    ];
+
+
+    var count = 7;
+
+
+    for(
+      var i = 0;
+      i < count;
+      i++
+    ){
+
+      var p =
+        document.createElement(
+          'div'
+        );
+
+
+      p.className =
+        'petal';
+
+
+      var size =
+        10 +
+        Math.random() * 10;
+
+
+      var dur =
+        16 +
+        Math.random() * 10;
+
+
+      var delay =
+        -(Math.random() * dur);
+
+
+      var sway =
+        16 +
+        Math.random() * 30;
+
+
+      p.style.left =
+        (Math.random() * 100)
+        + '%';
+
+
+      p.style.width =
+        size + 'px';
+
+
+      p.style.height =
+        (size * .75)
+        + 'px';
+
+
+      p.style.background =
+        colors[i % colors.length];
+
+
+      p.style.opacity =
+        '.85';
+
+
+      p.style.animationDuration =
+        dur + 's';
+
+
+      p.style.animationDelay =
+        delay + 's';
+
+
+      p.style.setProperty(
+        '--sway',
+        sway + 'px'
+      );
+
+
+      wrap.appendChild(p);
+
+    }
+
+  })();
+
+
+  /* =====================================================
+     ENVELOPE
+  ===================================================== */
+
+  var envelope =
+    document.getElementById(
+      'envelope'
+    );
+
+  var envelopeStage =
+    document.getElementById(
+      'envelopeStage'
+    );
+
+  var letterPaper =
+    document.getElementById(
+      'letterPaper'
+    );
+
+  var openBtn =
+    document.getElementById(
+      'openBtn'
+    );
+
+  var heroKicker =
+    document.getElementById(
+      'heroKicker'
+    );
+
+  var heroTitle =
+    document.getElementById(
+      'heroTitle'
+    );
+
+  var msgBlock =
+    document.getElementById(
+      'msgBlock'
+    );
+
+  var continueWrap =
+    document.getElementById(
+      'continueWrap'
+    );
+
+  var continueBtn =
+    document.getElementById(
+      'continueBtn'
+    );
+
+
+  openBtn.addEventListener(
+    'click',
+    function(){
+
+      envelope.classList.add(
+        'open'
+      );
+
+
+      openBtn.style.pointerEvents =
+        'none';
+
+
+      logEvent('open_envelope_click');
+
+
+      /*
+        Browser allows audio
+        because this happens
+        after a user click.
+      */
+
+      setPlaying(true);
+
+
+      setTimeout(
+        function(){
+
+          envelopeStage.classList.add(
+            'fade'
+          );
+
+
+          letterPaper.classList.add(
+            'show'
+          );
+
+
+          /*
+            Unlock question page.
+          */
+
+          unlocked[1] = true;
+
+          refreshChrome();
+
+        },
+        550
+      );
+
+
+      setTimeout(
+        function(){
+
+          heroKicker.classList.add(
+            'show'
+          );
+
+        },
+        900
+      );
+
+
+      setTimeout(
+        function(){
+
+          heroTitle.classList.add(
+            'show'
+          );
+
+        },
+        1150
+      );
+
+
+      setTimeout(
+        function(){
+
+          msgBlock.classList.add(
+            'show'
+          );
+
+
+          continueWrap.classList.add(
+            'show'
+          );
+
+
+          refreshChrome();
+
+        },
+        1550
+      );
+
+    }
+  );
+
+
+  /* =====================================================
+     CONTINUE
+  ===================================================== */
+
+  continueBtn.addEventListener(
+    'click',
+    function(){
+
+      logEvent('continue_click');
+
+      goTo(1);
+
+    }
+  );
+
+
+  /* =====================================================
+     QUESTION / NO ESCALATION
+  ===================================================== */
+
+  var stage = 0;
+
+
+  var subMessages = [
+
+    "Are you sure? 🥺",
+
+    "Really? 🥹",
+
+    "Please think about it one more time.",
+
+    "Please… 🥺",
+
+    "I really mean it… 🧸"
+
+  ];
+
+
+  var questionSub =
+    document.getElementById(
+      'questionSub'
+    );
+
+  var questionTitle =
+    document.getElementById(
+      'questionTitle'
+    );
+
+  var sticker =
+    document.getElementById(
+      'sticker'
+    );
+
+  var noBtn =
+    document.getElementById(
+      'noBtn'
+    );
+
+  var yesBtn =
+    document.getElementById(
+      'yesBtn'
+    );
+
+  var outcomeYes =
+    document.getElementById(
+      'outcomeYes'
+    );
+
+  var outcomeNo =
+    document.getElementById(
+      'outcomeNo'
+    );
+
+
+  /* =====================================================
+     OUTCOME
+  ===================================================== */
+
+  function goOutcome(which){
+
+    unlocked[2] = true;
+
+
+    if(which === 'yes'){
+
+      outcomeYes.hidden = false;
+
+      outcomeNo.hidden = true;
+
+    }
+    else{
+
+      outcomeNo.hidden = false;
+
+      outcomeYes.hidden = true;
+
+    }
+
+
+    goTo(2);
+
+  }
+
+
+  /* =====================================================
+     NO BUTTON
+  ===================================================== */
+
+  function handleNoClick(){
+
+    stage =
+      Math.min(
+        stage + 1,
+        subMessages.length
+      );
+
+
+    logEvent('no_click', 'count:' + stage);
+
+
+    questionSub.style.opacity =
+      '0';
+
+
+    setTimeout(
+      function(){
+
+        if(
+          stage <
+          subMessages.length
+        ){
+
+          questionSub.textContent =
+            subMessages[stage];
+
+
+          questionSub.style.opacity =
+            '1';
+
+        }
+        else{
+
+          /*
+            After 5 NO clicks,
+            show the cute sticker.
+          */
+
+          sticker.hidden =
+            false;
+
+
+          questionTitle.textContent =
+            'Please… one more chance?';
+
+
+          questionSub.textContent =
+            'I really mean it. 🥺';
+
+
+          questionSub.style.opacity =
+            '1';
+
+
+          noBtn.textContent =
+            'I need more time';
+
+
+          noBtn.removeEventListener(
+            'click',
+            handleNoClick
+          );
+
+
+          noBtn.addEventListener(
+            'click',
+            function(){
+
+              logEvent('no_final_more_time_click');
+
+              goOutcome('no');
+
+            }
+          );
+
+        }
+
+      },
+      200
+    );
+
+  }
+
+
+  noBtn.addEventListener(
+    'click',
+    handleNoClick
+  );
+
+
+  /* =====================================================
+     YES BUTTON
+  ===================================================== */
+
+  yesBtn.addEventListener(
+    'click',
+    function(){
+
+      logEvent('yes_click', 'no_count:' + stage);
+
+      goOutcome('yes');
+
+    }
+  );
+
+
+  /* =====================================================
+     RESTART
+  ===================================================== */
+
+  document
+    .getElementById('restartBtn')
+    .addEventListener(
+      'click',
+      function(){
+
+        logEvent('restart_click');
+
+        location.reload();
+
+      }
+    );
+
+
+  /* =====================================================
+     INITIALIZE
+  ===================================================== */
+
+  refreshChrome();
+
+  playReveal(0);
+
+})();
+
+</script>
+
+</body>
+</html>
